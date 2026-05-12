@@ -11,7 +11,7 @@ SNCC_DIR = "SNcc/"
 
 class Model() :
     """
-    A standard model of supernovae/AGB, loaded from file.
+    A simple standard model of supernovae/AGB, loaded from file.
     """
     def __init__(self,model_name,elements,dir):
         """
