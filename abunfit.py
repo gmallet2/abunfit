@@ -150,7 +150,7 @@ class AbunFit:
         )
         self.fit_results            = result.x
         self.fit_results_abundances = np.dot(self.fit_results, self.modmatrix)
-        self._data_array            = l_data   # conservé pour le MCMC
+        self._data_array            = l_data 
 
         errors = np.where(l_data[:, 1] > 0, l_data[:, 1], 1.0)
         self.chi2 = np.sum(
@@ -356,6 +356,4 @@ if __name__ == "__main__":
 
     # 3. Visualisations
     #a.plot_fit()                     # barres empilées avec erreurs MCMC
-    #a.plot_abundance_with_mcmc()     # enveloppe MCMC + résidus
-    #a.plot_mcmc_chains()             # diagnostic de convergence
     #a.plot_corner()                  # corrélations entre paramètres

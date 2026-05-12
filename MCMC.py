@@ -1,19 +1,18 @@
+"""
+Implements MCMC for abunfit application
+"""
 import numpy as np
 import emcee
 
 
 class MCMC:
     """
-    Exploration bayésienne des coefficients de mélange via emcee.
+    Exploring (with bayesian implementation) the parameters space, using emcee
 
-    Modèle statistique :
-        Prior   : uniforme sur [0, +∞) pour chaque coefficient
-                  (prior log-uniforme optionnel)
-        Likelihood : χ² gaussien
-            ln L = −½ Σ_el [ (obs_el − Σ c_i · model_i_el) / σ_el ]²
-
-    Le posterior est donc proportionnel à exp(−χ²/2) restreint aux
-    coefficients positifs — cohérent avec le fit par moindres carrés.
+    Stat. model :
+        Prior is uniform
+        Likelihood : gaussian χ² 
+    posterior is prop to exp(−χ²/2) 
     """
 
     @staticmethod
