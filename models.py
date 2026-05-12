@@ -94,6 +94,9 @@ class SNIaModel(Model) :
     def _manage_model(self,periodic_table) :
         """
         (Internal) : Used to transform the raw data from the model into usables self.y and self.x results
+        Inputs :
+            - periodic_table : a dictionnary of the periodic table, where each entry is : "H": {"Z": 1, "M": 1.008 ,"solar_val" : 1	2.59E+10}. Can be loaded for example using, in abunfit.py, 
+        the Tool.build_periodic_table() function ;
         """
         for el in range(len(self.elements)) : 
             for i in range(len(self.d_model)) :

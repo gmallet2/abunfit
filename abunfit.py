@@ -21,7 +21,7 @@ class Tools:
         """
         From the file "periodic_table.json" and a file of solar abundancies ("solar_table/lodders09.txt"), returns a periodic table as a dictionnary.
         Output :
-            - periodic_table : a dictionnary, where an entry is :   "H": {"Z": 1, "M": 1.008 ,"solar_val" : 1	2.59E+10},
+            - periodic_table : a dictionnary, where an entry is :   "H": {"Z": 1, "M": 1.008 ,"solar_val" : 2.59E+10},
         """
         with open(PERIODIC_TABLE, "r") as f:
             periodic_table = json.load(f)
@@ -297,12 +297,12 @@ class MultiFit:
                     a.fit(verbose=False)
                     chi2_results.append([list(combo), a.reduced_chi2, a.fit_results])
             except FileNotFoundError:
-                print("  Fichier manquant — ignoré.")
+                print("Missing file — ignored ;")
             except Exception as e:
-                print(f"  Erreur : {e} — ignoré.")
+                print(f"Error : {e} — ignored ;")
 
         if not chi2_results:
-            print("Aucun résultat.")
+            print("No results ;")
             return
 
         chi2_vals, fractions, l_names = [], [], []
@@ -316,10 +316,10 @@ class MultiFit:
         plt.figure()
         sc = plt.scatter(chi2_vals, fractions, c=chi2_vals,
                          cmap="viridis", alpha=0.8)
-        plt.colorbar(sc, label="Chi2 réduit")
-        plt.xlabel("Chi2 réduit")
+        plt.colorbar(sc, label="Reduced chi_2")
+        plt.xlabel("Reduced $\chi_2$")
         plt.ylabel("Fraction SNIa  c₀ / Σcᵢ")
-        plt.title("Résultats MultiFit")
+        plt.title("Results multifit")
         plt.xscale("log")
         plt.grid(True)
         plt.tight_layout()

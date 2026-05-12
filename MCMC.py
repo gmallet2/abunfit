@@ -8,30 +8,23 @@ import emcee
 class MCMC:
     """
     Exploring (with bayesian implementation) the parameters space, using emcee
-
-    Stat. model :
-        Prior is uniform
-        Likelihood : gaussian χ² 
-    posterior is prop to exp(−χ²/2) 
     """
-
+    
     @staticmethod
-    def log_prior(params: np.ndarray) -> float:
+    def log_prior(params) :
         """
         Uniform prior for params over 0.
         Inputs :
             - params (np.array) : array of parameters ;
         output :
-            0 or -infty ;
+            - 0 or -infty ;
         """
         if np.any(params < 0):
             return -np.inf
         return 0.0
 
     @staticmethod
-    def log_likelihood(params   : np.ndarray,
-                       modmatrix: np.ndarray,
-                       data     : np.ndarray) -> float:
+    def log_likelihood(params   : np.ndarray, modmatrix: np.ndarray, data     : np.ndarray) :
         """
         ln L = -1/2 chi_2
         data shape : (n_elements, 2) — [value, error]
@@ -44,7 +37,7 @@ class MCMC:
     @staticmethod
     def log_posterior(params   : np.ndarray,
                       modmatrix: np.ndarray,
-                      data     : np.ndarray) -> float:
+                      data     : np.ndarray) :
         lp = MCMC.log_prior(params)
         if not np.isfinite(lp):
             return -np.inf
@@ -56,18 +49,17 @@ class MCMC:
         """
         Launch MCMC with mcee
         Inputs :
-            modmatrix  : (n_models, n_elements)
-            data      : (n_elements, 2)
-            p0_best      : beginning point (result of the fit typically)
-
-            n_walkers   (int) : number of emcee walkers (has to be > 2*n_models)
-            n_steps      : number of steps per walker
-            n_burn       : burn-in (first steps to ignore)
-            perturbation : initial dispersion qround the best-fit
-            progress     : do we want a progress bar
+            - modmatrix  : (n_models, n_elements)
+            - data      : (n_elements, 2)
+            - p0_best      : beginning point (result of the fit typically)
+            - n_walkers   (int) : number of emcee walkers (has to be > 2*n_models)
+            - n_steps      : number of steps per walker
+            - n_burn       : burn-in (first steps to ignore)
+            - perturbation : initial dispersion qround the best-fit
+            - progress     : do we want a progress bar
         Outputs :
-            flat_samples : (n_walkers * (n_steps * n_burn), n_params)
-            sampler      : (objet emcee.EnsembleSampler) (for diagnosis)
+            - flat_samples : (n_walkers * (n_steps * n_burn), n_params)
+            - sampler      : (objet emcee.EnsembleSampler) (for diagnosis)
 
         """
         n_params = len(p0_best)
