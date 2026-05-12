@@ -267,7 +267,6 @@ class MultiFit:
     Class used to perform multiple fits, over many combinations of models : then, we can compare thoses combinations and find the best ones.
     """
     def __init__(self, l_models: list, all: bool = False):
-
         self.l_models = l_models
         if all:
             self.l_models = [
@@ -275,6 +274,7 @@ class MultiFit:
                 np.loadtxt(AVAILABLE_MODELS_SNIA, dtype="str").tolist(),
                 np.loadtxt(AVAILABLE_MODELS_SNCC, dtype="str").tolist(),
             ]
+        self.chi2_results = []
 
     def multifit(self, alpha: list = []):
         """
@@ -282,7 +282,6 @@ class MultiFit:
         Inputs :
             - alpha (list) : we can make a list of alphas, allowing to test combinations of models with different alphas.
         """
-        chi2_results = []
         for combo in itertools.product(*self.l_models):
             print(combo)
             try:
@@ -290,28 +289,27 @@ class MultiFit:
                     for a_val in alpha:
                         a = AbunFit(DATA, list(combo), alpha=a_val)
                         a.fit(verbose=False)
-                        chi2_results.append([list(combo) + [str(a_val)],
+                        self.chi2_results.append([list(combo) + [str(a_val)],
                                              a.reduced_chi2, a.fit_results])
                 else:
                     a = AbunFit(DATA, list(combo))
                     a.fit(verbose=False)
-                    chi2_results.append([list(combo), a.reduced_chi2, a.fit_results])
+                    self.chi2_results.append([list(combo), a.reduced_chi2, a.fit_results])
             except FileNotFoundError:
                 print("Missing file — ignored ;")
             except Exception as e:
                 print(f"Error : {e} — ignored ;")
 
-        if not chi2_results:
+        if not self.chi2_results:
             print("No results ;")
             return
-
-        chi2_vals, fractions, l_names = [], [], []
-        for names, chi2, params in chi2_results:
+        
+    def plot_combo_map(self) :
+        chi2_vals, fractions = [], []
+        for _, chi2, params in self.chi2_results:
             total = np.sum(params)
-            frac  = params[0] / total if total > 0 else np.nan
-            l_names.append(names)
             chi2_vals.append(chi2)
-            fractions.append(frac)
+            fractions.append(params[0]/total if total > 0 else np.nan)
 
         plt.figure()
         sc = plt.scatter(chi2_vals, fractions, c=chi2_vals,
@@ -325,16 +323,15 @@ class MultiFit:
         plt.tight_layout()
         plt.show()
 
-        arr     = np.array(chi2_vals)
-        indices = np.argsort(arr)[:10]
-        print("\n--- Top 10 ---")
-        for idx in indices:
-            print(f"  {l_names[idx]}  →  chi2r = {arr[idx]:.4f}")
-
-
-# ===========================================================================
-# Point d'entrée
-# ===========================================================================
+        
+    def display_best_combos(self,nb_best_combos = 10) :
+        chi2_vals, l_names = [], []
+        for names, chi2, _ in self.chi2_results:
+            l_names.append(names)
+            chi2_vals.append(chi2)
+        print("\n--- Top {indices} ---")
+        for idx in np.argsort(np.array(chi2_vals))[:nb_best_combos]:
+            print(f"  {l_names[idx]}  →  chi2r = {np.array(chi2_vals)[idx]:.4f}")
 
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/Abell2199_bvvapec.json"])
