@@ -17,7 +17,13 @@ class MCMC:
 
     @staticmethod
     def log_prior(params: np.ndarray) -> float:
-        """Prior uniforme sur R⁺ⁿ (tous les coefficients ≥ 0)."""
+        """
+        Uniform prior for params over 0.
+        Inputs :
+            - params (np.array) : array of parameters ;
+        output :
+            0 or -infty ;
+        """
         if np.any(params < 0):
             return -np.inf
         return 0.0
@@ -27,8 +33,8 @@ class MCMC:
                        modmatrix: np.ndarray,
                        data     : np.ndarray) -> float:
         """
-        ln L = −½ χ²
-        data shape : (n_elements, 2) — [valeur, erreur]
+        ln L = -1/2 chi_2
+        data shape : (n_elements, 2) — [value, error]
         """
         model    = np.dot(params, modmatrix)
         errors   = np.where(data[:, 1] > 0, data[:, 1], 1.0)
@@ -45,42 +51,32 @@ class MCMC:
         return lp + MCMC.log_likelihood(params, modmatrix, data)
 
     @staticmethod
-    def run(modmatrix     : np.ndarray,
-            data          : np.ndarray,
-            p0_best       : np.ndarray,
-            n_walkers     : int   = 64,
-            n_steps       : int   = 3000,
-            n_burn        : int   = 500,
-            perturbation  : float = 1e-3,
-            progress      : bool  = True) -> tuple[np.ndarray, object]:
+    def run(modmatrix : np.ndarray,data : np.ndarray, p0_best : np.ndarray, n_walkers = 64,
+            n_steps = 3000, n_burn = 500, perturbation = 1e-3, progress = True) :
         """
-        Lance le MCMC avec emcee.
+        Launch MCMC with mcee
+        Inputs :
+            modmatrix  : (n_models, n_elements)
+            data      : (n_elements, 2)
+            p0_best      : beginning point (result of the fit typically)
 
-        Paramètres :
-            modmatrix    : (n_models, n_elements)
-            data         : (n_elements, 2)
-            p0_best      : point de départ (résultat du fit moindres carrés)
-            n_walkers    : nombre de walkers (doit être ≥ 2 × n_params)
-            n_steps      : nombre de pas total par walker
-            n_burn       : nombre de pas de burn-in à ignorer
-            perturbation : amplitude de la perturbation initiale autour de p0_best
-            progress     : afficher la barre de progression emcee
+            n_walkers   (int) : number of emcee walkers (has to be > 2*n_models)
+            n_steps      : number of steps per walker
+            n_burn       : burn-in (first steps to ignore)
+            perturbation : initial dispersion qround the best-fit
+            progress     : do we want a progress bar
+        Outputs :
+            flat_samples : (n_walkers * (n_steps * n_burn), n_params)
+            sampler      : (objet emcee.EnsembleSampler) (for diagnosis)
 
-        Retourne :
-            flat_samples : (n_walkers × (n_steps − n_burn), n_params)
-            sampler      : objet emcee.EnsembleSampler (pour diagnostics)
         """
-
         n_params = len(p0_best)
         n_walkers = max(n_walkers, 2 * n_params + 2)
-
-        # Position initiale : légère perturbation autour du best-fit
-        # On s'assure que tous les walkers démarrent avec des valeurs positives
         rng = np.random.default_rng(seed=42)
         p0  = p0_best[np.newaxis, :] * (
             1.0 + perturbation * rng.standard_normal((n_walkers, n_params))
         )
-        p0  = np.abs(p0)   # garantir la positivité au départ
+        p0  = np.abs(p0) 
 
         sampler = emcee.EnsembleSampler(
             n_walkers, n_params,
