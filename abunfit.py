@@ -13,7 +13,7 @@ PERIODIC_TABLE        = "periodic_table.json"
 AVAILABLE_MODELS_SNCC = "list_models_SNcc.txt"
 AVAILABLE_MODELS_SNIA = "list_models_SNIa.txt"
 AVAILABLE_MODELS_AGB  = "list_models_AGB.txt"
-
+ALPHA_SALPETER = -2.35
 
 class Tools:
     @staticmethod
@@ -89,7 +89,7 @@ class AbunFit:
     """
     Class used to perform a simple fit : we fit abundancies of a set of elements, using a combination of chosen supernovae/AGB models.
     """
-    def __init__(self, f_input , l_models , alpha  = -2.35):
+    def __init__(self, f_input , l_models , alpha  = ALPHA_SALPETER):
         """
         Inputs :
             - f_input (str) : a .json abundances file, with the classical dictionnary   {"Si": [0.768, 0.0964], ...} : it's the abundances we want to fit ;
@@ -276,7 +276,18 @@ class MultiFit:
             ]
         self.chi2_results = []
 
-    def multifit(self, alpha: list = []):
+    def _fit_one(self,combo,alpha = ALPHA_SALPETER) :
+        """
+        (Internal) Used to fit one specifit combo
+        Inputs :
+            - combo (list) : a list of models names (combo)
+            - alpha : salpeter mass function alpha
+        """
+        a = AbunFit(DATA, list(combo), alpha=alpha)
+        a.fit(verbose=False)
+        self.chi2_results.append([list(combo) + [str(alpha)], a.reduced_chi2, a.fit_results])
+
+    def multifit(self, alpha  = []):
         """
         This is the fit function, which perform a fit over all the possible conbinations of the models of the object.
         Inputs :
@@ -287,14 +298,9 @@ class MultiFit:
             try:
                 if len(alpha) > 0:
                     for a_val in alpha:
-                        a = AbunFit(DATA, list(combo), alpha=a_val)
-                        a.fit(verbose=False)
-                        self.chi2_results.append([list(combo) + [str(a_val)],
-                                             a.reduced_chi2, a.fit_results])
+                        self._fit_one(combo,a_val)
                 else:
-                    a = AbunFit(DATA, list(combo))
-                    a.fit(verbose=False)
-                    self.chi2_results.append([list(combo), a.reduced_chi2, a.fit_results])
+                    self._fit_one(combo)
             except FileNotFoundError:
                 print("Missing file — ignored ;")
             except Exception as e:
@@ -335,12 +341,12 @@ class MultiFit:
 
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/Abell2199_bvvapec.json"])
-    #a = AbunFit(DATA, ['Le18_300-0-c3', 'A22S03_0'])
-    b = MultiFit([[],
-                  []],all=True)
-    b.multifit()
+    a = AbunFit(DATA, ['Le18_300-0-c3', 'Le18_300-0-c3', 'A22S03_0'])
+    #b = MultiFit([[],
+    #              []],all=True)
+    #b.multifit()
     # 1. Fit moindres carrés (rapide, donne le point de départ)
-    #a.fit()
+    a.fit()
 
     # 2. MCMC (explorer les incertitudes)
     #a.run_mcmc(
@@ -352,5 +358,5 @@ if __name__ == "__main__":
     #)
 
     # 3. Visualisations
-    #a.plot_fit()                     # barres empilées avec erreurs MCMC
-    #a.plot_corner()                  # corrélations entre paramètres
+    a.plot_fit()                     # barres empilées avec erreurs MCMC
+    a.plot_corner()                  # corrélations entre paramètres
