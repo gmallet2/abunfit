@@ -53,9 +53,9 @@ class Tools:
             values = [data[el][0] for el in elements]
             errors = [data[el][1] for el in elements]
 
-            offset = (i - (len(models)-1)/2) * 0.35
+            offset = (i - (len(models)-1)/2) * 0.15
 
-            ax.errorbar(x + offset,values,yerr=errors,fmt='o',capsize=5,label=model_name)
+            ax.errorbar(x + offset,values,yerr=errors,fmt='o',capsize=5,label=model_name,elinewidth=4)
 
         ax.set_xticks(x)
         ax.set_xticklabels(elements)
@@ -340,7 +340,7 @@ class MultiFit:
             print(f"  {l_names[idx]}  →  chi2r = {np.array(chi2_vals)[idx]:.4f}")
 
 if __name__ == "__main__":
-    #Tools.plot_abundance_compar([DATA,"data/Abell2199_bvvapec.json"])
+    Tools.plot_abundance_compar([DATA,"data/Abell2199_bvvapec.json","data/Abell2199_2T.json"])
     a = AbunFit(DATA, ['Le18_300-0-c3', 'Le18_300-0-c3', 'A22S03_0'])
     #b = MultiFit([[],
     #              []],all=True)
