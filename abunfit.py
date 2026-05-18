@@ -264,7 +264,7 @@ class MultiFit:
     """
     Class used to perform multiple fits, over many combinations of models : then, we can compare thoses combinations and find the best ones.
     """
-    def __init__(self, l_models, all = False):
+    def __init__(self, l_models, data_dir = DATA, all = False):
         self.l_models = l_models
         if all:
             self.l_models = [
@@ -273,7 +273,7 @@ class MultiFit:
                 np.loadtxt(AVAILABLE_MODELS_SNCC, dtype="str").tolist(),
             ]
         self.chi2_results = []
-
+        self.data_dir = data_dir
     def _fit_one(self,combo,alpha = ALPHA_SALPETER) :
         """
         (Internal) Used to fit one specifit combo
@@ -281,7 +281,7 @@ class MultiFit:
             - combo (list) : a list of models names (combo)
             - alpha : salpeter mass function alpha
         """
-        a = AbunFit(DATA, list(combo), alpha=alpha)
+        a = AbunFit(self.data_dir, list(combo), alpha=alpha)
         a.fit(verbose=False)
         self.chi2_results.append([list(combo) + [str(alpha)], a.reduced_chi2, a.fit_results])
 
@@ -339,12 +339,14 @@ class MultiFit:
 
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
-    a = AbunFit(DATA,   ['Le18_300-0-c3', 'A22S03_0'] )
-    #b = MultiFit([['Sh18_M10_5050_Z0_01'],['Si10_det_1.06_0.075Ne'],
-    #              ['A22S03_0']],all=True)
-    #b.multifit()
-    #b.plot_combo_map()
-    #b.display_best_combos()
+    a = AbunFit("data/abundancies_results/Abell2199_bvvapec.json",   ['Le18_300-0-c3', 'A22S03_0'] )
+    b = MultiFit([['Sh18_M10_5050_Z0_01'],['Si10_det_1.06_0.075Ne'],
+                  ['A22S03_0']],
+                  data_dir=DATA,
+                  all=True)
+    b.multifit()
+    b.plot_combo_map()
+    b.display_best_combos()
     # 1. Fit moindres carrés (rapide, donne le point de départ)
     a.fit()
 
