@@ -4,9 +4,9 @@ Implementation of models of supernovae and AGB, used for fitting abundancies ;
 import numpy as np
 import matplotlib.pyplot as plt
 
-AGB_DIR = "AGB/"
-SNIA_DIR = "SNIa/"
-SNCC_DIR = "SNcc/"
+AGB_DIR = "data/models/AGB/"
+SNIA_DIR = "data/models/SNIa/"
+SNCC_DIR = "data/models/SNcc/"
 
 
 class Model() :

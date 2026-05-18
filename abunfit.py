@@ -7,12 +7,12 @@ from models import AGBModel, SNccModel, SNIaModel
 import corner
 from MCMC import MCMC
 
-SOLAR_ABUN_TABLES     = "solar_tables/lodders09.txt"
-DATA                  = "data/Abell2199_bvvgadem.json"
-PERIODIC_TABLE        = "periodic_table.json"
-AVAILABLE_MODELS_SNCC = "list_models_SNcc.txt"
-AVAILABLE_MODELS_SNIA = "list_models_SNIa.txt"
-AVAILABLE_MODELS_AGB  = "list_models_AGB.txt"
+SOLAR_ABUN_TABLES     = "data/solar_tables/lodders09.txt"
+DATA                  = "data/abundancies_results/Abell2199_bvvgadem.json"
+PERIODIC_TABLE        = "data/periodic_table.json"
+AVAILABLE_MODELS_SNCC = "data/models/list_models_SNcc.txt"
+AVAILABLE_MODELS_SNIA = "data/models/list_models_SNIa.txt"
+AVAILABLE_MODELS_AGB  = "data/models/list_models_AGB.txt"
 ALPHA_SALPETER = -2.35
 
 class Tools:
@@ -257,14 +257,14 @@ class AbunFit:
             quantiles = [0.159, 0.5, 0.841], truths = self.fit_results, truth_color = "tomato", smooth = 1.0)
         defaults.update(corner_kwargs)
         corner.corner(self.flat_samples, **defaults)
-        plt.suptitle("MCMC poserior distributions", y=1.01, fontsize=11)
+        plt.suptitle("MCMC posterior distributions", y=1.01, fontsize=11)
         plt.show()
 
 class MultiFit:
     """
     Class used to perform multiple fits, over many combinations of models : then, we can compare thoses combinations and find the best ones.
     """
-    def __init__(self, l_models: list, all: bool = False):
+    def __init__(self, l_models, all = False):
         self.l_models = l_models
         if all:
             self.l_models = [
@@ -338,7 +338,7 @@ class MultiFit:
             print(f"  {l_names[idx]}  →  chi2r = {np.array(chi2_vals)[idx]:.4f}")
 
 if __name__ == "__main__":
-    #Tools.plot_abundance_compar([DATA,"data/Abell2199_bvvapec.json","data/Abell2199_2T.json"])
+    #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
     a = AbunFit(DATA,   ['Le18_300-0-c3', 'A22S03_0'] )
     #b = MultiFit([['Sh18_M10_5050_Z0_01'],['Si10_det_1.06_0.075Ne'],
     #              ['A22S03_0']],all=True)
@@ -348,9 +348,9 @@ if __name__ == "__main__":
     # 1. Fit moindres carrés (rapide, donne le point de départ)
     a.fit()
 
-    # 2. MCMC (explorer les incertitudes)
+    # 2. MCMC 
     #a.run_mcmc(
-    #    n_walkers    = 64,     # ≥ 2 × n_modèles
+    #    n_walkers    = 64,     # > 2 × n_modèles
     #n_steps      = 3000,   # augmenter si tau est grand
     #    n_burn       = 500,    # burn-in à ignorer
     #    perturbation = 1e-3,   # dispersion initiale autour du best-fit
