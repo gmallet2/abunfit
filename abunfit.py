@@ -55,7 +55,7 @@ class Tools:
 
             offset = (i - (len(models)-1)/2) * 0.15
 
-            ax.errorbar(x + offset,values,yerr=errors,fmt='o',capsize=5,label=model_name,elinewidth=4)
+            ax.errorbar(x + offset,values,yerr=errors,fmt='o',capsize=3,label=model_name,elinewidth=3)
 
         ax.set_xticks(x)
         ax.set_xticklabels(elements)
@@ -342,21 +342,23 @@ class MultiFit:
 if __name__ == "__main__":
     Tools.plot_abundance_compar([DATA,"data/Abell2199_bvvapec.json","data/Abell2199_2T.json"])
     a = AbunFit(DATA,   ['Sh18_M10_5050_Z0_01', 'Si10_det_1.06_0.075Ne', 'A22S03_0'] )
-    #b = MultiFit([[],
-    #              []],all=True)
+    #b = MultiFit([['Sh18_M10_5050_Z0_01'],['Si10_det_1.06_0.075Ne'],
+    #              ['A22S03_0']],all=False)
     #b.multifit()
+    #b.plot_combo_map()
+    #b.display_best_combos()
     # 1. Fit moindres carrés (rapide, donne le point de départ)
     a.fit()
 
     # 2. MCMC (explorer les incertitudes)
-    a.run_mcmc(
-        n_walkers    = 64,     # ≥ 2 × n_modèles
-    n_steps      = 3000,   # augmenter si tau est grand
-        n_burn       = 500,    # burn-in à ignorer
-        perturbation = 1e-3,   # dispersion initiale autour du best-fit
-        ci           = 68.27,  # intervalle de confiance (1σ)
-    )
+    #a.run_mcmc(
+    #    n_walkers    = 64,     # ≥ 2 × n_modèles
+    #n_steps      = 3000,   # augmenter si tau est grand
+    #    n_burn       = 500,    # burn-in à ignorer
+    #    perturbation = 1e-3,   # dispersion initiale autour du best-fit
+    #    ci           = 68.27,  # intervalle de confiance (1σ)
+    #)
 
     # 3. Visualisations
-    a.plot_fit()                     # barres empilées avec erreurs MCMC
-    a.plot_corner()                  # corrélations entre paramètres
+    #a.plot_fit()                     # barres empilées avec erreurs MCMC
+    #a.plot_corner()                  # corrélations entre paramètres
