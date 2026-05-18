@@ -76,11 +76,9 @@ class Fit:
     This class contains all the fit methods, so we can choose any of them to fit the abundances.
     """
     @staticmethod
-    def fitfunc(parameters: np.ndarray,
-                modmatrix : np.ndarray,
-                data      : np.ndarray) -> np.ndarray:
+    def fitfunc(parameters, modmatrix,data) :
         errors = np.where(data[:, 1] > 0, data[:, 1], 1.0)
-        return (data[:, 0] - np.dot(parameters, modmatrix)) / errors
+        return (data[:,0] - np.dot(parameters,modmatrix))/errors
 
 
 
@@ -271,7 +269,7 @@ class MultiFit:
         if all:
             self.l_models = [
                 np.loadtxt(AVAILABLE_MODELS_SNIA, dtype="str").tolist(),
-                np.loadtxt(AVAILABLE_MODELS_SNIA, dtype="str").tolist(),
+                #np.loadtxt(AVAILABLE_MODELS_SNIA, dtype="str").tolist(),
                 np.loadtxt(AVAILABLE_MODELS_SNCC, dtype="str").tolist(),
             ]
         self.chi2_results = []
@@ -340,10 +338,10 @@ class MultiFit:
             print(f"  {l_names[idx]}  →  chi2r = {np.array(chi2_vals)[idx]:.4f}")
 
 if __name__ == "__main__":
-    Tools.plot_abundance_compar([DATA,"data/Abell2199_bvvapec.json","data/Abell2199_2T.json"])
-    a = AbunFit(DATA,   ['Sh18_M10_5050_Z0_01', 'Si10_det_1.06_0.075Ne', 'A22S03_0'] )
+    #Tools.plot_abundance_compar([DATA,"data/Abell2199_bvvapec.json","data/Abell2199_2T.json"])
+    a = AbunFit(DATA,   ['Le18_300-0-c3', 'A22S03_0'] )
     #b = MultiFit([['Sh18_M10_5050_Z0_01'],['Si10_det_1.06_0.075Ne'],
-    #              ['A22S03_0']],all=False)
+    #              ['A22S03_0']],all=True)
     #b.multifit()
     #b.plot_combo_map()
     #b.display_best_combos()
@@ -360,5 +358,5 @@ if __name__ == "__main__":
     #)
 
     # 3. Visualisations
-    #a.plot_fit()                     # barres empilées avec erreurs MCMC
+    a.plot_fit()                     # barres empilées avec erreurs MCMC
     #a.plot_corner()                  # corrélations entre paramètres
