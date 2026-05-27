@@ -106,7 +106,7 @@ class AbunFit:
         self.models   = {}
 
         for name in l_models:
-            if not self.model_from_name(name) :
+            if not self._model_from_name(name) :
                 print(f"----- WARNING : model '{name}' can't be found -----")
 
         # Results fields
@@ -119,9 +119,9 @@ class AbunFit:
         self.mcmc_lo                = None   # borne basse 1σ
         self.mcmc_hi                = None   # borne haute 1σ
 
-    def model_from_name(self,model_name) :
+    def _model_from_name(self,model_name) :
         """
-        Load a model from the name of the model : it checks if the model is available, and its type (SNIA, SNCC, AGB).
+        (Internal) Load a model from the name of the model : it checks if the model is available, and its type (SNIA, SNCC, AGB).
         Inputs :
             - model_name (str) : the name of the model to load ;
         Outputs :
@@ -274,17 +274,17 @@ class MultiFit:
     """
     def __init__(self, l_models, data_dir = DATA):
         self.l_models = []
-        for i in l_models :
-            if i in ["AGB","SN1A","SNCC"] :
-                with open(AVAILABLE_MODELS, "r", newline="", encoding="utf-8") as f:
-                    l_available_models = list(csv.reader(f))
-                    l = []
-                    for j in l_available_models :
-                        if j[1] == i :
-                            l.append(j[0])
+        with open(AVAILABLE_MODELS, "r", newline="", encoding="utf-8") as f:
+            l_available_models = list(csv.reader(f))
+        for model in l_models :
+            if model in ["AGB","SN1A","SNCC"] : #To add : possibility of choosing only DD, Deflagration etc...
+                l = [] 
+                for j in l_available_models :
+                    if j[1] == model :
+                        l.append(j[0])
                 self.l_models.append(l)
             else :
-                self.l_models.append(i)
+                self.l_models.append(model)
 
         self.chi2_results = []
         self.data_dir = data_dir
