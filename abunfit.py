@@ -6,13 +6,12 @@ import itertools
 from models import AGBModel, SNccModel, SNIaModel
 import corner
 from MCMC import MCMC
+import csv
 
 SOLAR_ABUN_TABLES     = "data/solar_tables/lodders09.txt"
 DATA                  = "data/abundancies_results/Abell2199_bvvgadem.json"
 PERIODIC_TABLE        = "data/periodic_table.json"
-AVAILABLE_MODELS_SNCC = "data/models/list_models_SNcc.txt"
-AVAILABLE_MODELS_SNIA = "data/models/list_models_SNIa.txt"
-AVAILABLE_MODELS_AGB  = "data/models/list_models_AGB.txt"
+AVAILABLE_MODELS      = "data/models/models.csv"
 ALPHA_SALPETER = -2.35
 
 class Tools:
@@ -49,7 +48,6 @@ class Tools:
         x = np.arange(len(elements))
         _, ax = plt.subplots(figsize=(10, 6))
         for i, (model_name, data) in enumerate(models.items()):
-
             values = [data[el][0] for el in elements]
             errors = [data[el][1] for el in elements]
 
@@ -96,11 +94,8 @@ class AbunFit:
         """
         self.data = None
 
-        d_available_models = {
-            "SNIa": np.loadtxt(AVAILABLE_MODELS_SNIA, dtype="str").tolist(),
-            "SNcc": np.loadtxt(AVAILABLE_MODELS_SNCC, dtype="str").tolist(),
-            "AGB" : np.loadtxt(AVAILABLE_MODELS_AGB,  dtype="str").tolist(),
-        }
+        with open(AVAILABLE_MODELS, "r", newline="", encoding="utf-8") as f:
+            self.l_available_models = list(csv.reader(f))
 
         with open(f_input, "r") as f:
             self.data = json.load(f)
@@ -111,13 +106,7 @@ class AbunFit:
         self.models   = {}
 
         for name in l_models:
-            if name in d_available_models["SNIa"]:
-                self.models[name] = SNIaModel(name, self.elements, self.periodic_table)
-            elif name in d_available_models["SNcc"]:
-                self.models[name] = SNccModel(name, self.elements, self.periodic_table, self.alpha)
-            elif name in d_available_models["AGB"]:
-                self.models[name] = AGBModel(name, self.elements, self.periodic_table, self.alpha)
-            else:
+            if not self.model_from_name(name) :
                 print(f"----- WARNING : model '{name}' can't be found -----")
 
         # Results fields
@@ -130,6 +119,25 @@ class AbunFit:
         self.mcmc_lo                = None   # borne basse 1σ
         self.mcmc_hi                = None   # borne haute 1σ
 
+    def model_from_name(self,model_name) :
+        """
+        Load a model from the name of the model : it checks if the model is available, and its type (SNIA, SNCC, AGB).
+        Inputs :
+            - model_name (str) : the name of the model to load ;
+        Outputs :
+            - (bool) : True if the model has been found, or False ;
+        """
+        for i in self.l_available_models :
+            if i[0]==model_name :
+                if i[1] == "AGB" :
+                    self.models[model_name] = AGBModel(model_name, self.elements, self.periodic_table, self.alpha)
+                elif i[1] == "SN1A" :
+                    self.models[model_name] = SNIaModel(model_name, self.elements, self.periodic_table)
+                elif i[1] == "SNCC" :
+                    self.models[model_name] = SNccModel(model_name, self.elements, self.periodic_table, self.alpha)
+                return True
+        return False
+    
     def fit(self, verbose = True,fitfunc = Fit.fitfunc):
         """
         Perform a fit of the abundancies with the given models of supernovae/AGB.
@@ -264,16 +272,23 @@ class MultiFit:
     """
     Class used to perform multiple fits, over many combinations of models : then, we can compare thoses combinations and find the best ones.
     """
-    def __init__(self, l_models, data_dir = DATA, all = False):
-        self.l_models = l_models
-        if all:
-            self.l_models = [
-                np.loadtxt(AVAILABLE_MODELS_SNIA, dtype="str").tolist(),
-                #np.loadtxt(AVAILABLE_MODELS_SNIA, dtype="str").tolist(),
-                np.loadtxt(AVAILABLE_MODELS_SNCC, dtype="str").tolist(),
-            ]
+    def __init__(self, l_models, data_dir = DATA):
+        self.l_models = []
+        for i in l_models :
+            if i in ["AGB","SN1A","SNCC"] :
+                with open(AVAILABLE_MODELS, "r", newline="", encoding="utf-8") as f:
+                    l_available_models = list(csv.reader(f))
+                    l = []
+                    for j in l_available_models :
+                        if j[1] == i :
+                            l.append(j[0])
+                self.l_models.append(l)
+            else :
+                self.l_models.append(i)
+
         self.chi2_results = []
         self.data_dir = data_dir
+        print(self.l_models)
     def _fit_one(self,combo,alpha = ALPHA_SALPETER) :
         """
         (Internal) Used to fit one specifit combo
@@ -340,9 +355,8 @@ class MultiFit:
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
     a = AbunFit("data/abundancies_results/Abell2199_bvvgadem.json",   ['Le18_300-0-c3', 'Ch04_1E-6'] )
-    b = MultiFit([['Le18_300-0-c3'],['Ch04_1E-6']],
-                  data_dir=DATA,
-                  all=True)
+    b = MultiFit(["AGB",['Ch04_1E-6']],
+                  data_dir=DATA)
     b.multifit()
     b.plot_combo_map()
     b.display_best_combos()
