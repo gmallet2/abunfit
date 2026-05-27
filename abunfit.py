@@ -355,7 +355,7 @@ class MultiFit:
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
     a = AbunFit("data/abundancies_results/Abell2199_bvvgadem.json",   ['Le18_300-0-c3', 'Ch04_1E-6'] )
-    b = MultiFit(["AGB",['Ch04_1E-6']],
+    b = MultiFit(["AGB","SNCC"],
                   data_dir=DATA)
     b.multifit()
     b.plot_combo_map()
