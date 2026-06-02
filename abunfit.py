@@ -277,7 +277,7 @@ class MultiFit:
         with open(AVAILABLE_MODELS, "r", newline="", encoding="utf-8") as f:
             l_available_models = list(csv.reader(f))
         for model in l_models :
-            if model in ["AGB","SN1A","SNCC","D","DEFLAGRATION","HY","D2","D6"] : #To add : possibility of choosing only DD, Deflagration etc...
+            if model in ["AGB","SN1A","SNCC","DETONATION","DEFLAGRATION","HY","D2","D6"] : #To add : possibility of choosing only DD, Deflagration etc...
                 l = [] 
                 for j in l_available_models :
                     if model in j:
@@ -355,7 +355,7 @@ class MultiFit:
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
     a = AbunFit("data/abundancies_results/Abell2199_bvvgadem.json",   ['Le18_300-0-c3', 'Ch04_1E-6'] )
-    b = MultiFit(["HY","D6"],
+    b = MultiFit(["DETONATION","D6"],
                   data_dir=DATA)
     b.multifit()
     b.plot_combo_map()
