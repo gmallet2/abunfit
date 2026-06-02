@@ -277,10 +277,10 @@ class MultiFit:
         with open(AVAILABLE_MODELS, "r", newline="", encoding="utf-8") as f:
             l_available_models = list(csv.reader(f))
         for model in l_models :
-            if model in ["AGB","SN1A","SNCC"] : #To add : possibility of choosing only DD, Deflagration etc...
+            if model in ["AGB","SN1A","SNCC","D","DEFLAGRATION","HY","D2","D6"] : #To add : possibility of choosing only DD, Deflagration etc...
                 l = [] 
                 for j in l_available_models :
-                    if j[1] == model :
+                    if model in j:
                         l.append(j[0])
                 self.l_models.append(l)
             else :
@@ -355,13 +355,13 @@ class MultiFit:
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
     a = AbunFit("data/abundancies_results/Abell2199_bvvgadem.json",   ['Le18_300-0-c3', 'Ch04_1E-6'] )
-    b = MultiFit(["AGB","SNCC"],
+    b = MultiFit(["HY","D6"],
                   data_dir=DATA)
     b.multifit()
     b.plot_combo_map()
     b.display_best_combos()
     # 1. Fit moindres carrés (rapide, donne le point de départ)
-    a.fit()
+    #a.fit()
 
     # 2. MCMC 
     #a.run_mcmc(
@@ -373,5 +373,5 @@ if __name__ == "__main__":
     #)
 
     # 3. Visualisations
-    a.plot_fit()                     # barres empilées avec erreurs MCMC
+    #a.plot_fit()                     # barres empilées avec erreurs MCMC
     #a.plot_corner()                  # corrélations entre paramètres
