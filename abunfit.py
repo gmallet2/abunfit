@@ -9,7 +9,7 @@ from MCMC import MCMC
 import csv
 
 SOLAR_ABUN_TABLES     = "data/solar_tables/lodders09.txt"
-DATA                  = "data/abundancies_results/Abell2199_bvvgadem.json"
+DATA                  = "data/abundancies_results/Abell2199_2T.json"
 PERIODIC_TABLE        = "data/periodic_table.json"
 AVAILABLE_MODELS      = "data/models/models.csv"
 ALPHA_SALPETER = -2.35
@@ -344,18 +344,20 @@ class MultiFit:
 
         
     def display_best_combos(self,nb_best_combos = 10) :
-        chi2_vals, l_names = [], []
-        for names, chi2, _ in self.chi2_results:
+        chi2_vals, l_names, l_params = [], [], []
+        for names, chi2, params in self.chi2_results:
             l_names.append(names)
             chi2_vals.append(chi2)
+            l_params.append(params)
         print("\n--- Top {indices} ---")
         for idx in np.argsort(np.array(chi2_vals))[:nb_best_combos]:
             print(f"  {l_names[idx]}  →  chi2r = {np.array(chi2_vals)[idx]:.4f}")
+            print(l_params[idx])
 
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
-    a = AbunFit("data/abundancies_results/Abell2199_bvvgadem.json",   ['Le18_300-0-c3', 'Ch04_1E-6'] )
-    b = MultiFit(["DETONATION","D6"],
+    #a = AbunFit("data/abundancies_results/Abell2199_2T.json",   ['Ch04_1E-6', 'Le18_300-0-c3'] )
+    b = MultiFit(["SNCC","SN1A"],
                   data_dir=DATA)
     b.multifit()
     b.plot_combo_map()
