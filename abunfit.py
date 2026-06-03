@@ -59,7 +59,7 @@ class Tools:
         elements = list(next(iter(models.values())).keys())
         x = np.arange(len(elements))
 
-        fig, ax = plt.subplots(figsize=(12, 7))
+        _, ax = plt.subplots(figsize=(12, 7))
 
         markers = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']
         colors = plt.cm.tab10.colors
@@ -72,7 +72,7 @@ class Tools:
             values = [data[el][0] for el in elements]
             errors = [data[el][1] for el in elements]
 
-            offset = (i - (n_models - 1) / 2) * width
+            offset = (i - (n_models -1)/2) * width
             ax.errorbar(
                 x + offset,
                 values,
@@ -93,13 +93,11 @@ class Tools:
         ax.set_ylabel("Abundance")
         ax.set_title("Comparison of abundance models", pad=15)
 
-        # Grille discrète
         ax.grid(True, linestyle='--', alpha=0.3)
 
-        # Légende plus visible
         leg = ax.legend(
             loc='upper left',
-            bbox_to_anchor=(1.02, 1),
+            bbox_to_anchor=(0.09, 1),
             frameon=True,
             fancybox=True,
             shadow=False,
@@ -398,14 +396,14 @@ class MultiFit:
             print(l_params[idx])
 
 if __name__ == "__main__":
-    #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
-    #a = AbunFit("data/abundancies_results/Abell2199_2T.json",   ['A22S03_0', 'Ba06_DDTd', 'Iw99_W7new'] )
-    b = MultiFit([["A22S03_0","Ch04_1E-6","Ch04_1E-4","Ch04_1E-3"],"NMCH","SMCH"],data_dir=DATA)
-    b.multifit()
-    b.plot_combo_map()
-    b.display_best_combos()
+    #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_bvvgadem.json"])
+    a = AbunFit("data/abundancies_results/Abell2199_2T.json",   ['A22S03_0',"Ba06_DDTd","Iw99_W7new"] )
+    #b = MultiFit([["A22S03_0","Ch04_1E-6","Ch04_1E-4","Ch04_1E-3"],"NMCH","SMCH"],data_dir=DATA)
+    #b.multifit()
+    #b.plot_combo_map()
+    #b.display_best_combos()
     # 1. Fit moindres carrés (rapide, donne le point de départ)
-    #a.fit()
+    a.fit()
 
     # 2. MCMC 
     #a.run_mcmc(
@@ -417,5 +415,5 @@ if __name__ == "__main__":
     #)
 
     # 3. Visualisations
-    #a.plot_fit()                     # barres empilées avec erreurs MCMC
-    #a.plot_corner()                  # corrélations entre paramètres
+    a.plot_fit()                     # barres empilées avec erreurs MCMC
+    a.plot_corner()                  # corrélations entre paramètres
