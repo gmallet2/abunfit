@@ -9,7 +9,8 @@ If you want to fit abundances over supernovae models, you'll first need to prese
     ...
     "Fe": [0.769, 0.0151],
     "Ni": [0.64, 0.0845]
-}```
+}
+```
 Here, the first element of each list is the abundance value, the second being the error.
 Then, you can change the DATA in `abunfit.py` to specify your file.
 After that, you can perform a fit, in the following way : 
@@ -22,21 +23,14 @@ Then :
 
 Finally, you can try to perform a mcmc, to estimate the errors around your results :
 
-
-`a.run_mcmc(`
-
-`n_walkers    = 64,     # > 2 × n_models`
-
-`n_steps      = 3000,   # increase if tau is big`
-
-`n_burn       = 500,    # burn-in to ignore`
-
-`perturbation = 1e-3,   # initial dispersion around the fit`
-
-`ci           = 68.27,  # CI (1σ)`
-
-`)`
-
+```
+a.run_mcmc(
+    n_walkers    = 64,     # > 2 × n_models
+    n_steps      = 3000,   # increase if tau is big
+    n_burn       = 500,    # burn-in to ignore
+    perturbation = 1e-3,   # initial dispersion around the fit
+    ci           = 68.27,  # CI (1σ) )
+```
 
 ### Fitting and comparing many models
 
@@ -63,6 +57,8 @@ For example, if you want to search the fits for all the combinations of Delayed-
 `fit = Multifit(["DD","SNCC"],data_dir = DATA)`
 
 Then, to perform the fit, and display the results : 
-`b.multifit()`
-`b.plot_combo_map()`
-`b.display_best_combos()`
+```
+b.multifit()
+b.plot_combo_map()
+b.display_best_combos()
+```
