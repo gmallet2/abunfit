@@ -33,37 +33,80 @@ class Tools:
         return periodic_table
     
     @staticmethod
-    def plot_abundance_compar(L_abund) :
+    def plot_abundance_compar(L_abund):
         """
-        Plot a comparison, with error bars, of different abundancies.
-        Inputs :
-            - L_abund (list) : a list of .json files containing abundancies (classical dictionnary :   "Si": [0.768 (val), 0.0964 (error)]))
+        Compare abundance models with publication-quality error bars.
+
+        Inputs : 
+            - L_abund (list) List of JSON files containing abundances : {"Si": [value, error], ...}
         """
+        # Style
+        plt.rcParams.update({
+            "font.size": 14,
+            "axes.labelsize": 16,
+            "axes.titlesize": 18,
+            "xtick.labelsize": 13,
+            "ytick.labelsize": 13,
+            "legend.fontsize": 13,
+            "figure.dpi": 150
+        })
         models = {}
-        for i in L_abund :
-            with open(i, "r") as f:
-                model = json.load(f)
-                elements = list(model.keys())
-            models[i] = model
+
+        for file in L_abund:
+            with open(file, "r") as f:
+                models[file.split("/")[-1].replace(".json", "")] = json.load(f)
+
+        elements = list(next(iter(models.values())).keys())
         x = np.arange(len(elements))
-        _, ax = plt.subplots(figsize=(10, 6))
+
+        fig, ax = plt.subplots(figsize=(12, 7))
+
+        markers = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']
+        colors = plt.cm.tab10.colors
+
+        n_models = len(models)
+        width = 0.15
+
         for i, (model_name, data) in enumerate(models.items()):
+
             values = [data[el][0] for el in elements]
             errors = [data[el][1] for el in elements]
 
-            offset = (i - (len(models)-1)/2) * 0.15
-
-            ax.errorbar(x + offset,values,yerr=errors,fmt='o',capsize=3,label=model_name,elinewidth=3)
-
+            offset = (i - (n_models - 1) / 2) * width
+            ax.errorbar(
+                x + offset,
+                values,
+                yerr=errors,
+                fmt=markers[i % len(markers)],
+                markersize=8,
+                color=colors[i % len(colors)],
+                capsize=5,
+                capthick=1.5,
+                elinewidth=2,
+                linewidth=2,
+                label=model_name
+            )
         ax.set_xticks(x)
         ax.set_xticklabels(elements)
 
-        ax.set_ylabel("Abundance")
         ax.set_xlabel("Element")
-        ax.set_title("Comparison of abundance models")
+        ax.set_ylabel("Abundance")
+        ax.set_title("Comparison of abundance models", pad=15)
 
-        ax.legend()
-        ax.grid(alpha=0.3)
+        # Grille discrète
+        ax.grid(True, linestyle='--', alpha=0.3)
+
+        # Légende plus visible
+        leg = ax.legend(
+            loc='upper left',
+            bbox_to_anchor=(1.02, 1),
+            frameon=True,
+            fancybox=True,
+            shadow=False,
+            borderaxespad=0.
+        )
+
+        leg.get_frame().set_alpha(0.95)
 
         plt.tight_layout()
         plt.show()
@@ -357,8 +400,7 @@ class MultiFit:
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_2T.json"])
     #a = AbunFit("data/abundancies_results/Abell2199_2T.json",   ['A22S03_0', 'Ba06_DDTd', 'Iw99_W7new'] )
-    b = MultiFit(["SNCC","NMCH","SMCH"],
-                 data_dir=DATA)
+    b = MultiFit([["A22S03_0","Ch04_1E-6","Ch04_1E-4","Ch04_1E-3"],"NMCH","SMCH"],data_dir=DATA)
     b.multifit()
     b.plot_combo_map()
     b.display_best_combos()

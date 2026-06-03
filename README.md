@@ -19,7 +19,8 @@ A set of models can simply be a list of models : `[Ch04_2E-2,No13_SNe_0,Iw99_WDD
 - D2 : all the Double-Detonation (SNIA) av. models ;
 - D6 : all the Dynamically-Driven Double-Degenerate Double-Detonation (SNIA) models ;
 - HY : all the hypernovae models (SNCC) ;
-
+- NMCH : all the Near-Chandrasekhar available models ;
+- SMCH : all the Sub-Chandrasekhar available models ;
 For example, if you want to search the fits for all the combinations of Delayed-Detonation SNIa with SNCCs, you just do : 
 `fit = Multifit(["DD","SNCC"],data_dir = DATA)`
 
