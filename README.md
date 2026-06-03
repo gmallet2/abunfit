@@ -1,4 +1,47 @@
+This code implements a simple least square method for the following problem. We have measures of abundances of some elements (Ar, Ca, Fe...), with their errors : the measure comes from the ICM (intra-cluster medium), or any medium where we can consider that the enrichment comes from a great amount of nucleosynthesis sources (such as supernovae and AGB). This code implements many models of supernovae and AGB, and their yields (in term of abundances). This code allows to determine the best combination of models explaining the observed abundances : allowing for example to provide informations about some privilegied models of SN1A, SNCC, AGBs... The list of the implemented models is not fixed, and can be improved by the user (it'll be explained at the end of this README).
+
 ### Fit
+
+If you want to fit abundances over supernovae models, you'll first need to present your abundances in a json file, in the following way : 
+
+`{`
+
+`  "Si": [0.717, 0.101],`
+
+`...`
+
+`  "Fe": [0.769, 0.0151],`
+
+`  "Ni": [0.64, 0.0845]`
+
+`}`
+Here, the first element of each list is the abundance value, the second being the error.
+Then, you can change the DATA in `abunfit.py` to specify your file.
+After that, you can perform a fit, in the following way : 
+
+`a = AbunFit(DATA,   ['A22S03_0',"Ba06_DDTd","Iw99_W7new"] )`
+Here, I choose three models : we try to fit the abundances with a linear combination of those 3 models (1 SNCC, 2 SN1A models here).
+Then : 
+
+`a.fit()`, `a.plot_fit()` and `a.corner()` to fit and display the results.
+
+Finally, you can try to perform a mcmc, to estimate the errors around your results :
+
+
+`a.run_mcmc(`
+
+`n_walkers    = 64,     # > 2 × n_models`
+
+`n_steps      = 3000,   # increase if tau is big`
+
+`n_burn       = 500,    # burn-in to ignore`
+
+`perturbation = 1e-3,   # initial dispersion around the fit`
+
+`ci           = 68.27,  # CI (1σ)`
+
+`)`
+
 
 ### Fitting and comparing many models
 

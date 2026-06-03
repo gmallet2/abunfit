@@ -58,7 +58,6 @@ class Tools:
 
         elements = list(next(iter(models.values())).keys())
         x = np.arange(len(elements))
-
         _, ax = plt.subplots(figsize=(12, 7))
 
         markers = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']
@@ -347,7 +346,7 @@ class MultiFit:
         Inputs :
             - alpha (list) : we can make a list of alphas, allowing to test combinations of models with different alphas.
         """
-        for combo in itertools.product(*self.l_models):
+        for combo in itertools.product(*self.l_models) :
             print(combo)
             try:
                 if len(alpha) > 0:
@@ -355,7 +354,7 @@ class MultiFit:
                         self._fit_one(combo,a_val)
                 else:
                     self._fit_one(combo)
-            except FileNotFoundError:
+            except FileNotFoundError :
                 print("Missing file — ignored ;")
             except Exception as e:
                 print(f"Error : {e} — ignored ;")
@@ -396,14 +395,14 @@ class MultiFit:
             print(l_params[idx])
 
 if __name__ == "__main__":
-    #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_bvvgadem.json"])
-    a = AbunFit("data/abundancies_results/Abell2199_2T.json",   ['A22S03_0',"Ba06_DDTd","Iw99_W7new"] )
+    Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_bvvgadem.json"])
+    #a = AbunFit("data/abundancies_results/Abell2199_2T.json",   ['A22S03_0',"Ba06_DDTd","Iw99_W7new"] )
     #b = MultiFit([["A22S03_0","Ch04_1E-6","Ch04_1E-4","Ch04_1E-3"],"NMCH","SMCH"],data_dir=DATA)
     #b.multifit()
     #b.plot_combo_map()
     #b.display_best_combos()
     # 1. Fit moindres carrés (rapide, donne le point de départ)
-    a.fit()
+    #a.fit()
 
     # 2. MCMC 
     #a.run_mcmc(
@@ -415,5 +414,5 @@ if __name__ == "__main__":
     #)
 
     # 3. Visualisations
-    a.plot_fit()                     # barres empilées avec erreurs MCMC
-    a.plot_corner()                  # corrélations entre paramètres
+    #a.plot_fit()                     # barres empilées avec erreurs MCMC
+    #a.plot_corner()                  # corrélations entre paramètres
