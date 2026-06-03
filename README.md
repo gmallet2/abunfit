@@ -4,17 +4,12 @@ This code implements a simple least square method for the following problem. We 
 
 If you want to fit abundances over supernovae models, you'll first need to present your abundances in a json file, in the following way : 
 
-`{`
-
-`  "Si": [0.717, 0.101],`
-
-`...`
-
-`  "Fe": [0.769, 0.0151],`
-
-`  "Ni": [0.64, 0.0845]`
-
-`}`
+```{
+    "Si": [0.717, 0.101],
+    ...
+    "Fe": [0.769, 0.0151],
+    "Ni": [0.64, 0.0845]
+}```
 Here, the first element of each list is the abundance value, the second being the error.
 Then, you can change the DATA in `abunfit.py` to specify your file.
 After that, you can perform a fit, in the following way : 
