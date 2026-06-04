@@ -3,6 +3,7 @@ Implementation of models of supernovae and AGB, used for fitting abundancies ;
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 
 AGB_DIR = "data/models/AGB/"
 SNIA_DIR = "data/models/SNIa/"
@@ -13,43 +14,57 @@ class Model() :
     """
     A simple standard model of supernovae/AGB, loaded from file.
     """
-    def __init__(self,model_name,elements,dir):
+    def __init__(self,model_name,elements,dir,periodic_table):
         """
         Inputs :
             - model_name : the name of the model : it has to ba available in the database.
             - elements : a list of the elements (H,He...) to be extracted and used (it's not necessary to use all the elements from the model of the database ;)
             - dir : the direction where we find the model ;
         """
+        self.periodic_table = periodic_table
         self.model = None
         self.elements=elements
         self.model_name=model_name
         self.dir=dir
         self.y=np.zeros(len(self.elements))
         self.x=np.zeros(len(self.elements))
+        with open(dir+model_name+".json", "r") as f:   
+            self.data = json.load(f)
+
+        self._integrate_over_mass()
+        self._normalize()
 
     def _integrate_over_mass(self) : 
-        """
-        (Internal) For some models, self.m is a list of mass, over which integrate the IMF. That's what this function does.
-        """
-        model, val = self.model_name.rsplit("_", 1)
+
+        self.m = self.data["Mass"]
+
         for n, el in enumerate(self.elements):
-            try :
-                data_mod = np.loadtxt(self.dir+model+"/"+val+"/"+str(el)+".txt")
-            except(FileNotFoundError) :
-                data_mod = np.zeros(data_mod.shape)
+            if self.m == None : 
+                print("NONONONONOE")
+                data_mod = np.zeros_like(np.array([0]),dtype=float)
+            else : 
+                data_mod = np.zeros_like(np.array(self.m),dtype=float)
+            for i in list(self.data.keys()) : 
+                if i.startswith(el + "_") or i == el:  # plus robuste que "if el in key"
+                    print(i)
+                    print(self.data[i])
+                    data_mod += np.array(self.data[i])
             if len(data_mod.shape)==0:
                 yiel=np.array([data_mod])
             elif len(data_mod.shape)==1:
                 yiel=np.array(data_mod)
             else:
                 yiel=np.array(np.sum(data_mod.T, axis=1))   
+            if self.m == None :
+                print(data_mod)
+                self.y[n] = data_mod[0]
+            else : 
+                if ("Ro10" in self.model_name or "K10_AGB" in self.model_name): # special cases
+                    self.y[n] = np.sum(yiel*self.m**self.alpha) / np.sum(self.m**self.alpha)
+                else:
+                    self.y[n] = np.trapezoid(yiel*np.power(self.m,self.alpha), x=self.m) / np.trapezoid(np.power(self.m,self.alpha), x=self.m)
 
-            if ("Ro10" in self.model_name or "K10_AGB" in self.model_name): # special cases
-                self.y[n] = np.sum(yiel*self.m**self.alpha) / np.sum(self.m**self.alpha)
-            else:
-                self.y[n] = np.trapezoid(yiel*np.power(self.m,self.alpha), x=self.m) / np.trapezoid(np.power(self.m,self.alpha), x=self.m)
-
-    def _normalize(self,periodic_table) :
+    def _normalize(self) :
         """
         (Internal) Normalization of the abundancies ;
         Inputs :
@@ -57,7 +72,7 @@ class Model() :
         the Tool.build_periodic_table() function ;
         """
         for el in range(len(self.elements)) : 
-            self.x[el]=self.y[el]/(periodic_table[self.elements[el]]["M"]*periodic_table[self.elements[el]]["solar_val"])
+            self.x[el]=self.y[el]/(self.periodic_table[self.elements[el]]["M"]*self.periodic_table[self.elements[el]]["solar_val"])
     def plot_model(self) :
         """
         Used to plot the abundances values of a model ;
@@ -86,10 +101,7 @@ class SNIaModel(Model) :
             - periodic_table : a dictionnary of the periodic table, where each entry is : "H": {"Z": 1, "M": 1.008 ,"solar_val" : 1	2.59E+10}. Can be loaded for example using, in abunfit.py, 
         the Tool.build_periodic_table() function ;
         """
-        super().__init__(model_name,elements,SNIA_DIR)
-        self.d_model=np.loadtxt(self.dir+model_name+".txt")
-        self._manage_model(periodic_table)
-        self._normalize(periodic_table)
+        super().__init__(model_name,elements,SNIA_DIR,periodic_table)
 
     def _manage_model(self,periodic_table) :
         """
@@ -117,10 +129,8 @@ class SNccModel(Model) :
             - alpha : as, for SnCC models, we nedd to integrate the IMF, we need the alpha value for the Salpeter function.
         the Tool.build_periodic_table() function ;
         """
-        super().__init__(model_name,elements,SNCC_DIR)
         self.alpha=alpha
-        self._manage_model()
-        self._normalize(periodic_table)
+        super().__init__(model_name,elements,SNCC_DIR,periodic_table)
 
     def _manage_model(self) :
         """
@@ -184,10 +194,8 @@ class AGBModel(Model) :
             - alpha : as, for AGB models, we need to integrate the IMF, we need the alpha value for the Salpeter function.
         the Tool.build_periodic_table() function ;
         """
-        super().__init__(model_name,elements,AGB_DIR)
-        self.alpha=alpha
-        self._manage_model()
-        self._normalize(periodic_table)
+        self.alpha = alpha
+        super().__init__(model_name,elements,AGB_DIR,periodic_table)
     def _manage_model(self) :
         """
         (Internal) : Used to transform the raw data from the model into usables self.y and self.x results
@@ -200,5 +208,5 @@ class AGBModel(Model) :
 
 if __name__=="__main__" :
     from abunfit import Tools
-    a = SNIaModel('Ba06_DDTa',["O","Ne","Mg","Si","S","Ar","Ca","Cr","Mn","Fe","Ni"],Tools._build_periodic_table())
+    a = SNccModel('Le25_A22S03_0',["O","Ne","Mg","Si","S","Ar","Ca","Cr","Mn","Fe","Ni"],Tools.build_periodic_table(),alpha=-2.35)
     a.plot_model()
