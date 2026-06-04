@@ -127,8 +127,9 @@ class SNccModel(Model) :
         (Internal) : Used to transform the raw data from the model into usables self.y and self.x results
         """
         m = self.model_name.split("_")
+        print(m)
         model,type = m[0],m[1]
-        if model == "A22S03" :
+        if model == "Le25" :
             self.m = np.array([15,20,25,40])
         if model == "No06" :
             self.m=np.array([13,15,18,20,25,30,40])
