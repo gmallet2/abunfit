@@ -3,11 +3,14 @@ import scipy.optimize as optimization
 import matplotlib.pyplot as plt
 import json
 import itertools
-from models import AGBModel, SNccModel, SNIaModel
+from models import AGBModel,SNccModel,SNIaModel
 import corner
 from MCMC import MCMC
 import csv
 
+AGB_DIR = "data/models/AGB/"
+SNIA_DIR = "data/models/SNIa/"
+SNCC_DIR = "data/models/SNcc/"
 SOLAR_ABUN_TABLES     = "data/solar_tables/lodders09.txt"
 DATA                  = "data/abundancies_results/Abell2199_2T.json"
 PERIODIC_TABLE        = "data/periodic_table.json"
