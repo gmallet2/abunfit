@@ -34,7 +34,86 @@ class Tools:
             except (IndexError, TypeError):
                 info["solar_val"] = None
         return periodic_table
-    
+    @staticmethod
+    def plot_models_compar(L_models,elements,alpha=-2.35) :
+        """
+        Compare models with publication-quality error bars.
+
+        Inputs : 
+            - L_abund (list)  : List of models names ["Le25-A22S03_0","Le18_300-0-c3"]
+            - elements (list) : List of elements (["Ca","Ni","Fe"])
+        """
+        # Style
+        plt.rcParams.update({
+            "font.size": 14,
+            "axes.labelsize": 16,
+            "axes.titlesize": 18,
+            "xtick.labelsize": 13,
+            "ytick.labelsize": 13,
+            "legend.fontsize": 13,
+            "figure.dpi": 150
+        })
+        models = {}
+        periodic_table = Tools.build_periodic_table()
+
+        with open(AVAILABLE_MODELS, "r", newline="", encoding="utf-8") as f:
+            l_available_models = list(csv.reader(f))
+        for model_name in L_models : 
+            for i in l_available_models :
+                if i[0]==model_name :
+                    if i[1] == "AGB" :
+                        models[model_name] = AGBModel(model_name, elements, periodic_table, alpha)
+                    elif i[1] == "SN1A" :
+                        models[model_name] = SNIaModel(model_name, elements, periodic_table)
+                    elif i[1] == "SNCC" :
+                        models[model_name] = SNccModel(model_name, elements, periodic_table, alpha)
+        x = np.arange(len(elements))
+        _, ax = plt.subplots(figsize=(12, 7))
+
+        markers = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']
+        colors = plt.cm.tab10.colors
+
+        n_models = len(models)
+        width = 0.15
+
+        for i, (model_name, data) in enumerate(models.items()):
+
+            values = data.x
+
+
+            offset = (i - (n_models -1)/2) * width
+            ax.bar(
+                x + offset,
+                values,
+                width=width,
+                color=colors[i % len(colors)],
+                label=model_name,
+                alpha=0.8
+            )
+        ax.set_xticks(x)
+        ax.set_xticklabels(elements)
+
+        ax.set_xlabel("Element")
+        ax.set_ylabel("Abundance")
+        ax.set_title("Comparison of abundance models", pad=15)
+
+        ax.grid(True, linestyle='--', alpha=0.3)
+
+        leg = ax.legend(
+            loc='upper left',
+            bbox_to_anchor=(0.09, 1),
+            frameon=True,
+            fancybox=True,
+            shadow=False,
+            borderaxespad=0.
+        )
+
+        leg.get_frame().set_alpha(0.95)
+        print("TRY")
+        plt.tight_layout()
+        plt.show()
+
+
     @staticmethod
     def plot_abundance_compar(L_abund):
         """
@@ -399,13 +478,14 @@ class MultiFit:
 
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_bvvgadem.json"])
-    a = AbunFit(DATA,['Le25_A22S03_0',"Le18_300-0-c3"])
+    Tools.plot_models_compar(['Le25_A22S03_0',"Le18_300-0-c3"],["Ca","Fe","Ni"])
+    #a = AbunFit(DATA,['Le25_A22S03_0',"Le18_300-0-c3"])
     #b = MultiFit([["A22S03_0","Ch04_1E-6","Ch04_1E-4","Ch04_1E-3"],"NMCH","SMCH"],data_dir=DATA)
     #b.multifit()
     #b.plot_combo_map()
     #b.display_best_combos()
     # 1. Fit moindres carrés (rapide, donne le point de départ)
-    a.fit()
+    #a.fit()
 
     # 2. MCMC 
     #a.run_mcmc(
@@ -413,9 +493,9 @@ if __name__ == "__main__":
     #n_steps      = 3000,   # augmenter si tau est grand
     #    n_burn       = 500,    # burn-in à ignorer
     #    perturbation = 1e-3,   # dispersion initiale autour du best-fit
-    #    ci           = 68.27,  # intervalle de confiance (1σ)
+    #   ci           = 68.27,  # intervalle de confiance (1σ)
     #)
 
     # 3. Visualisations
-    a.plot_fit()                     # barres empilées avec erreurs MCMC
-    a.plot_corner()                  # corrélations entre paramètres
+    #a.plot_fit()                     # barres empilées avec erreurs MCMC
+    #a.plot_corner()                  # corrélations entre paramètres

@@ -73,7 +73,7 @@ class Model() :
         plt.title("Abundance Fit for the model "+self.model_name)
         plt.tight_layout()
         plt.show()
-
+        
 class SNIaModel(Model) :
     """
     Heritage of Model, used for SNIa models only ;
