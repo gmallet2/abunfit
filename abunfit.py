@@ -62,11 +62,11 @@ class Tools:
             for i in l_available_models :
                 if i[0]==model_name :
                     if i[1] == "AGB" :
-                        models[model_name] = Model(model_name, elements, periodic_table, alpha)
+                        models[model_name] = Model(model_name, elements, AGB_DIR,periodic_table, alpha)
                     elif i[1] == "SN1A" :
-                        models[model_name] = Model(model_name, elements, periodic_table)
+                        models[model_name] = Model(model_name, elements, SNIA_DIR,periodic_table)
                     elif i[1] == "SNCC" :
-                        models[model_name] = Model(model_name, elements, periodic_table, alpha)
+                        models[model_name] = Model(model_name, elements, SNCC_DIR,periodic_table, alpha)
         x = np.arange(len(elements))
         _, ax = plt.subplots(figsize=(12, 7))
         colors = plt.cm.tab10.colors
@@ -246,11 +246,11 @@ class AbunFit:
         for i in self.l_available_models :
             if i[0]==model_name :
                 if i[1] == "AGB" :
-                    self.models[model_name] = Model(model_name, self.elements, self.periodic_table, self.alpha)
+                    self.models[model_name] = Model(model_name, self.elements, AGB_DIR,self.periodic_table, self.alpha)
                 elif i[1] == "SN1A" :
-                    self.models[model_name] = SNIaModel(model_name, self.elements, self.periodic_table)
+                    self.models[model_name] = Model(model_name, self.elements, SNIA_DIR,self.periodic_table)
                 elif i[1] == "SNCC" :
-                    self.models[model_name] = SNccModel(model_name, self.elements, self.periodic_table, self.alpha)
+                    self.models[model_name] = Model(model_name, self.elements,SNCC_DIR, self.periodic_table, self.alpha)
                 return True
         return False
     
@@ -475,7 +475,7 @@ if __name__ == "__main__":
     #Tools.plot_models_compar(['Ch04_0',"Ch04_1E-3","No06_0.001"],["Si","S","Ar","Ca","Fe","Cr","Mn","Ni"])
     #Tools.plot_models_compar(['Le25_A22S03_0',"Ch04_1E-3","No06_0.001"],["Si","S","Ar","Ca","Fe","Cr","Mn","Ni"])
     a = AbunFit(DATA,['Le25_A22S03_0',"Le18_300-0-c3"])
-    #a = AbunFit(DATA,['Le25_A22S03_0',"Le18_300-0-c3"])
+    a = AbunFit(DATA,['Ch04_0',"Le18_300-0-c3"])
     #b = MultiFit([["A22S03_0","Ch04_1E-6","Ch04_1E-4","Ch04_1E-3"],"NMCH","SMCH"],data_dir=DATA)
     #b.multifit()
     #b.plot_combo_map()

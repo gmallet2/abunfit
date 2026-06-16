@@ -43,14 +43,12 @@ class Model() :
 
         for n, el in enumerate(self.elements):
             if self.m == None : 
-                print("NONONONONOE")
                 data_mod = np.zeros_like(np.array([0]),dtype=float)
             else : 
                 data_mod = np.zeros_like(np.array(self.m),dtype=float)
             for i in list(self.data.keys()) : 
-                if i.startswith(el + "_") or i == el:  # plus robuste que "if el in key"
-                    print(i)
-                    print(self.data[i])
+                j = i.split("_")
+                if j[0] == el :
                     data_mod += np.array(self.data[i])
             if len(data_mod.shape)==0:
                 yiel=np.array([data_mod])
@@ -60,7 +58,6 @@ class Model() :
                 yiel=np.array(np.sum(data_mod.T, axis=1))  
                  
             if self.m == None :
-                print(data_mod)
                 self.y[n] = data_mod[0]
             else : 
                 if ("Ro10" in self.model_name or "K10_AGB" in self.model_name): # special cases
@@ -142,13 +139,7 @@ class SNccModel(Model) :
         m = self.model_name.split("_")
         print(m)
         model,type = m[0],m[1]
-        if model == "Le25" :
-            self.m = np.array([15,20,25,40])
-        if model == "No06" :
-            self.m=np.array([13,15,18,20,25,30,40])
-        elif model == "Ch04" :
-            self.m=np.array([13,15,20,25,30,35])
-        elif model == "No13" :
+        if model == "No13" :
             if type == "SNcc" :
                 if self.model_name== "No13_SNcc_0" :
                     self.m=np.array([11,13,15,18,20,25,30,40,100,140])
@@ -163,8 +154,6 @@ class SNccModel(Model) :
                     self.m=np.array([20,25,30,40,100,140])
                 else :
                     self.m=np.array([20,25,30,40])
-        elif (self.model_name == "He0210_SNcc_0"):
-            self.m=np.array([10,12,15,20,25,35,50,75,100])
         elif (self.model_name == "He0210_PISNe_0"):
             self.m=np.array([140,150,158,168,177,186,195,205,214,223,232,242,251,260])
         elif (self.model_name == "He0210_SNe_0"):
