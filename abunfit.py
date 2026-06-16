@@ -3,7 +3,7 @@ import scipy.optimize as optimization
 import matplotlib.pyplot as plt
 import json
 import itertools
-from models import AGBModel,SNccModel,SNIaModel
+from models import AGBModel,SNccModel,SNIaModel,Model
 import corner
 from MCMC import MCMC
 import csv
@@ -62,29 +62,23 @@ class Tools:
             for i in l_available_models :
                 if i[0]==model_name :
                     if i[1] == "AGB" :
-                        models[model_name] = AGBModel(model_name, elements, periodic_table, alpha)
+                        models[model_name] = Model(model_name, elements, periodic_table, alpha)
                     elif i[1] == "SN1A" :
-                        models[model_name] = SNIaModel(model_name, elements, periodic_table)
+                        models[model_name] = Model(model_name, elements, periodic_table)
                     elif i[1] == "SNCC" :
-                        models[model_name] = SNccModel(model_name, elements, periodic_table, alpha)
+                        models[model_name] = Model(model_name, elements, periodic_table, alpha)
         x = np.arange(len(elements))
         _, ax = plt.subplots(figsize=(12, 7))
-
-        markers = ['o', 's', '^', 'D', 'v', 'P', '*', 'X']
         colors = plt.cm.tab10.colors
-
         n_models = len(models)
         width = 0.15
 
         for i, (model_name, data) in enumerate(models.items()):
 
-            values = data.x
-
-
             offset = (i - (n_models -1)/2) * width
             ax.bar(
                 x + offset,
-                values,
+                data.x,
                 width=width,
                 color=colors[i % len(colors)],
                 label=model_name,
@@ -252,7 +246,7 @@ class AbunFit:
         for i in self.l_available_models :
             if i[0]==model_name :
                 if i[1] == "AGB" :
-                    self.models[model_name] = AGBModel(model_name, self.elements, self.periodic_table, self.alpha)
+                    self.models[model_name] = Model(model_name, self.elements, self.periodic_table, self.alpha)
                 elif i[1] == "SN1A" :
                     self.models[model_name] = SNIaModel(model_name, self.elements, self.periodic_table)
                 elif i[1] == "SNCC" :
@@ -478,14 +472,16 @@ class MultiFit:
 
 if __name__ == "__main__":
     #Tools.plot_abundance_compar([DATA,"data/abundancies_results/Abell2199_bvvapec.json","data/abundancies_results/Abell2199_bvvgadem.json"])
-    Tools.plot_models_compar(['Le25_A22S03_0',"Le18_300-0-c3"],["Ca","Fe","Ni"])
+    #Tools.plot_models_compar(['Ch04_0',"Ch04_1E-3","No06_0.001"],["Si","S","Ar","Ca","Fe","Cr","Mn","Ni"])
+    #Tools.plot_models_compar(['Le25_A22S03_0',"Ch04_1E-3","No06_0.001"],["Si","S","Ar","Ca","Fe","Cr","Mn","Ni"])
+    a = AbunFit(DATA,['Le25_A22S03_0',"Le18_300-0-c3"])
     #a = AbunFit(DATA,['Le25_A22S03_0',"Le18_300-0-c3"])
     #b = MultiFit([["A22S03_0","Ch04_1E-6","Ch04_1E-4","Ch04_1E-3"],"NMCH","SMCH"],data_dir=DATA)
     #b.multifit()
     #b.plot_combo_map()
     #b.display_best_combos()
     # 1. Fit moindres carrés (rapide, donne le point de départ)
-    #a.fit()
+    a.fit()
 
     # 2. MCMC 
     #a.run_mcmc(
@@ -497,5 +493,5 @@ if __name__ == "__main__":
     #)
 
     # 3. Visualisations
-    #a.plot_fit()                     # barres empilées avec erreurs MCMC
+    a.plot_fit()                     # barres empilées avec erreurs MCMC
     #a.plot_corner()                  # corrélations entre paramètres
