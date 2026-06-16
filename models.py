@@ -140,12 +140,7 @@ class SNccModel(Model) :
         print(m)
         model,type = m[0],m[1]
         if model == "No13" :
-            if type == "SNcc" :
-                if self.model_name== "No13_SNcc_0" :
-                    self.m=np.array([11,13,15,18,20,25,30,40,100,140])
-                else :
-                    self.m=np.array([13,15,18,20,25,30,40])
-            elif type == "PISNe" :
+            if type == "PISNe" :
                 self.m=np.array([140,150,170,200,270,300])
             elif type == "SNe" :
                 self.m=np.array([11,13,15,18,20,25,30,40,100,140,150,170,200,270,300])
@@ -200,5 +195,3 @@ class AGBModel(Model) :
 
 if __name__=="__main__" :
     from abunfit import Tools
-    a = SNccModel('Le25_A22S03_0',["O","Ne","Mg","Si","S","Ar","Ca","Cr","Mn","Fe","Ni"],Tools.build_periodic_table(),alpha=-2.35)
-    a.plot_model()
