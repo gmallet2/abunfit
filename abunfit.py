@@ -3,7 +3,7 @@ import scipy.optimize as optimization
 import matplotlib.pyplot as plt
 import json
 import itertools
-from models import AGBModel,SNccModel,SNIaModel,Model
+from models import Model
 import corner
 from MCMC import MCMC
 import csv
@@ -475,7 +475,7 @@ if __name__ == "__main__":
     #Tools.plot_models_compar(['Ch04_0',"Ch04_1E-3","No06_0.001"],["Si","S","Ar","Ca","Fe","Cr","Mn","Ni"])
     #Tools.plot_models_compar(['Le25_A22S03_0',"Ch04_1E-3","No06_0.001"],["Si","S","Ar","Ca","Fe","Cr","Mn","Ni"])
     a = AbunFit(DATA,['Le25_A22S03_0',"Le18_300-0-c3"])
-    a = AbunFit(DATA,['Ch04_0',"Le18_300-0-c3"])
+    #a = AbunFit(DATA,['Ch04_0',"Le18_300-0-c3"])
     #b = MultiFit([["A22S03_0","Ch04_1E-6","Ch04_1E-4","Ch04_1E-3"],"NMCH","SMCH"],data_dir=DATA)
     #b.multifit()
     #b.plot_combo_map()
