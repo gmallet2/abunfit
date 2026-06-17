@@ -89,43 +89,6 @@ class Model() :
         plt.show()
         
 
-class SNccModel(Model) :
-    """
-    Heritage of Model, used for SNcc models only ;
-    """
-    def __init__(self, model_name,elements,periodic_table,alpha):
-        """
-        Inputs :
-            - model_name : the name of the model : it has to ba available in the database.
-            - elements : a list of the elements (H,He...) to be extracted and used (it's not necessary to use all the elements from the model of the database ;)
-            - periodic_table : a dictionnary of the periodic table, where each entry is : "H": {"Z": 1, "M": 1.008 ,"solar_val" : 1	2.59E+10}. Can be loaded for example using, in abunfit.py, 
-            - alpha : as, for SnCC models, we nedd to integrate the IMF, we need the alpha value for the Salpeter function.
-        the Tool.build_periodic_table() function ;
-        """
-        super().__init__(model_name,elements,SNCC_DIR,periodic_table)
-
-    def _manage_model(self) :
-        """
-        (Internal) : Used to transform the raw data from the model into usables self.y and self.x results
-        """
-        m = self.model_name.split("_")
-        print(m)
-        model,type = m[0],m[1]
-        if (self.model_name == "Su16_N20"):
-            self.m=np.array([12.25, 12.5, 12.75, 13.0, 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 14.0, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8, 14.9, 15.2, 15.7, 15.8, 
-            15.9, 16.0, 16.1, 16.2, 16.3, 16.4, 16.5, 16.6, 16.7, 16.8, 16.9, 17.0, 17.1, 17.3, 17.4, 17.5, 17.6, 17.7, 17.9, 18.0, 18.1, 18.2, 18.3, 18.4, 18.5, 18.7, 
-            18.8, 18.9, 19.0, 19.1, 19.2, 19.3, 19.4, 19.7, 19.8, 20.1, 20.2, 20.3, 20.4, 20.5, 20.6, 20.8, 21.0, 21.1, 21.2, 21.5, 21.6, 21.7, 25.2, 25.3, 25.4, 25.5, 
-            25.6, 25.7, 25.8, 25.9, 26.0, 26.1, 26.2, 26.3, 26.4, 26.5, 26.6, 26.7, 26.8, 26.9, 27.0, 27.1, 27.2, 27.3, 27.4, 29.0, 29.1, 29.2, 29.6, 60, 80, 100, 120])
-        elif (self.model_name == "Su16_W18"):
-            self.m=np.array([12.25, 12.5, 12.75, 13.0, 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7, 13.8, 13.9, 14.0, 14.1, 14.2, 14.3, 14.4, 14.5, 14.6, 14.7, 14.8, 14.9, 15.2, 15.7, 15.8, 
-            16.0, 16.1, 16.2, 16.3, 16.4, 16.5, 16.6, 16.7, 16.8, 16.9, 17.0, 17.1, 17.3, 17.4, 17.5, 17.6, 17.9, 18.1, 18.2, 18.3, 18.4, 18.5, 19.2, 19.3, 19.7, 19.8, 
-            20.1, 20.2, 20.3, 20.4, 20.5, 20.8, 21.0, 21.1, 21.2, 21.5, 21.6, 25.2, 25.4, 25.5, 25.6, 25.7, 25.8, 25.9, 26.0, 26.1, 26.2, 26.3, 26.4, 26.5, 27.0, 27.1, 
-            27.2, 27.3, 60, 120])
-        elif model == "Ro10" : 
-            self.m=np.array([1.])
-        self._integrate_over_mass()
-
-
 class AGBModel(Model) :
     """
     Heritage of Model, used for AGB models only ;
