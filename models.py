@@ -15,6 +15,8 @@ class Model() :
             - model : the name of the model : it has to ba available in the database.
             - elements : a list of the elements (H,He...) to be extracted and used (it's not necessary to use all the elements from the model of the database ;)
             - dir : the direction where we find the model ;
+            - periodic_table : the periodic table as a dictionnary (built using for example Tools.build_periodic_table() in abunfit.py) ;
+            - alpha : the alpha for the Salpeter IMF, used only for SNCC and AGB (not SN1A) ;
         """
         self.alpha=alpha
         self.model = model
