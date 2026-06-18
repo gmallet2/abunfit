@@ -74,16 +74,8 @@ class Tools:
         width = 0.15
 
         for i, (model_name, data) in enumerate(models.items()):
-
             offset = (i - (n_models -1)/2) * width
-            ax.bar(
-                x + offset,
-                data.x,
-                width=width,
-                color=colors[i % len(colors)],
-                label=model_name,
-                alpha=0.8
-            )
+            ax.bar(x + offset,data.x,width=width,color=colors[i % len(colors)],label=model_name,alpha=0.8)
         ax.set_xticks(x)
         ax.set_xticklabels(elements)
 
@@ -93,14 +85,7 @@ class Tools:
 
         ax.grid(True, linestyle='--', alpha=0.3)
 
-        leg = ax.legend(
-            loc='upper left',
-            bbox_to_anchor=(0.09, 1),
-            frameon=True,
-            fancybox=True,
-            shadow=False,
-            borderaxespad=0.
-        )
+        leg = ax.legend(loc='upper left',bbox_to_anchor=(0.09, 1),frameon=True,fancybox=True,shadow=False,borderaxespad=0.)
 
         leg.get_frame().set_alpha(0.95)
         print("TRY")
@@ -265,11 +250,7 @@ class AbunFit:
         x0     = np.ones(self.modmatrix.shape[0])
         l_data = np.array([self.data[el] for el in self.elements], dtype=float)
 
-        result = optimization.least_squares(
-            fitfunc, x0,
-            args=(self.modmatrix, l_data),
-            bounds=(0, np.inf),
-        )
+        result = optimization.least_squares(fitfunc, x0,args=(self.modmatrix, l_data),bounds=(0, np.inf))
         self.fit_results            = result.x
         self.fit_results_abundances = np.dot(self.fit_results, self.modmatrix)
         self._data_array            = l_data 

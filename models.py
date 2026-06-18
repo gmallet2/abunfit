@@ -5,31 +5,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 
-AGB_DIR = "data/models/AGB/"
-SNIA_DIR = "data/models/SNIa/"
-SNCC_DIR = "data/models/SNcc/"
-
-
 class Model() :
     """
     A simple standard model of supernovae/AGB, loaded from file.
     """
-    def __init__(self,model_name,elements,dir,periodic_table,alpha=-2.35):
+    def __init__(self,model,elements,dir,periodic_table,alpha=-2.35):
         """
         Inputs :
-            - model_name : the name of the model : it has to ba available in the database.
+            - model : the name of the model : it has to ba available in the database.
             - elements : a list of the elements (H,He...) to be extracted and used (it's not necessary to use all the elements from the model of the database ;)
             - dir : the direction where we find the model ;
         """
         self.alpha=alpha
-        self.model = None
+        self.model = model
         self.periodic_table = periodic_table
         self.elements=elements
-        self.model_name=model_name
-        self.dir=dir
         self.y=np.zeros(len(self.elements))
         self.x=np.zeros(len(self.elements))
-        with open(dir+model_name+".json", "r") as f:   
+        with open(dir+self.model+".json", "r") as f:   
             self.data = json.load(f)
 
         self._integrate_over_mass()
@@ -50,20 +43,16 @@ class Model() :
                 j = i.split("_")
                 if j[0] == el :
                     data_mod += np.array(self.data[i])
-            if len(data_mod.shape)==0:
-                yiel=np.array([data_mod])
-            elif len(data_mod.shape)==1:
-                yiel=np.array(data_mod)
-            else:
-                yiel=np.array(np.sum(data_mod.T, axis=1))  
-                 
+
+            yiel=np.array(data_mod)
+  
             if self.m == None :
                 self.y[n] = data_mod[0]
             else : 
-                if ("Ro10" in self.model_name or "K10_AGB" in self.model_name): # special cases
-                    self.y[n] = np.sum(yiel*self.m**self.alpha) / np.sum(self.m**self.alpha)
+                if len(self.m)==1 :
+                    self.y[n] = np.sum(yiel*self.m[0]**self.alpha) / np.sum(self.m[0]**self.alpha)
                 else:
-                    self.y[n] = np.trapezoid(yiel*np.power(self.m,self.alpha), x=self.m) / np.trapezoid(np.power(self.m,self.alpha), x=self.m)
+                    self.y[n] = np.trapezoid(yiel*np.power(self.m,self.alpha), x=self.m)/np.trapezoid(np.power(self.m,self.alpha), x=self.m)
             
     def _normalize(self) :
         """
@@ -82,37 +71,8 @@ class Model() :
         contrib = self.x
         plt.bar(xaxis,contrib,bottom=bottom,color=color,alpha=0.8)
         plt.xticks(xaxis, self.elements)
-        plt.ylabel("Abundance for the model "+self.model_name)
+        plt.ylabel("Abundance for the model "+self.model)
         plt.xlabel("Element")
-        plt.title("Abundance Fit for the model "+self.model_name)
+        plt.title("Abundance Fit for the model "+self.model)
         plt.tight_layout()
         plt.show()
-        
-
-class AGBModel(Model) :
-    """
-    Heritage of Model, used for AGB models only ;
-    """
-    def __init__(self, model_name,elements,periodic_table,alpha):
-        """
-        Inputs :
-            - model_name : the name of the model : it has to ba available in the database.
-            - elements : a list of the elements (H,He...) to be extracted and used (it's not necessary to use all the elements from the model of the database ;)
-            - periodic_table : a dictionnary of the periodic table, where each entry is : "H": {"Z": 1, "M": 1.008 ,"solar_val" : 1	2.59E+10}. Can be loaded for example using, in abunfit.py, 
-            - alpha : as, for AGB models, we need to integrate the IMF, we need the alpha value for the Salpeter function.
-        the Tool.build_periodic_table() function ;
-        """
-        self.alpha = alpha
-        super().__init__(model_name,elements,AGB_DIR,periodic_table)
-    def _manage_model(self) :
-        """
-        (Internal) : Used to transform the raw data from the model into usables self.y and self.x results
-        """
-        if "K10_AGB" in self.model_name:
-            self.m=np.array([1])
-        else:
-            self.m=np.array([0.9,1.0,1.25,1.5,1.75,1.9,2.0,2.25,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5])
-        self._integrate_over_mass()
-
-if __name__=="__main__" :
-    from abunfit import Tools
